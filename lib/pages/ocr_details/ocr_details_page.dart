@@ -1,26 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:getx_app/pages/home/home_page.dart';
 import 'package:getx_app/pages/ocr_details/ocr_details_controller.dart';
-import 'package:firebase_ml_vision/firebase_ml_vision.dart';
-import 'dart:io';
+import 'package:getx_app/routes/app_routes.dart';
 
 
 
 class OCRDetailsPage extends GetView<OCRDetailsController>{
 
-  var text="";
-  bool _imageLoaded = false;
-  //File _pickedImage=null;
-
 
   @override
   Widget build(BuildContext context) {
+       controller.OCRImage();
+
     return Scaffold(
       body: Column(
         children: <Widget>[
           SizedBox(height: 100.0),
-          _imageLoaded
+          controller.file_loaded
               ? Center(
               child: Container(
                 decoration: BoxDecoration(
@@ -38,45 +34,30 @@ class OCRDetailsPage extends GetView<OCRDetailsController>{
               ))
               : Container(),
           SizedBox(height: 10.0),
-          text == ''
+          controller.text == ''
               ? Text('Text will display here')
               :  Expanded(
             child: SingleChildScrollView(
               child: Padding(
                 padding: const EdgeInsets.all(15.0),
                 child: Text(
-                  text,
+                  controller.text,
                 ),
               ),
             ),
           ),
           RaisedButton(
             child: const Text('Save', style: TextStyle(fontSize: 20)),
-            onPressed: () => Get.to(HomePage())
+            onPressed: () => Get.toNamed(
+              AppRoutes.HOME,
+              //arguments: {'image': controller.image, 'ocr_text': controller.ocr_text},
+            )
             ,)
         ],
       ),
     );
   }
 
-  Future OCRImage(File Image)async{
-    //await Future.delayed(Duration(seconds: 5));
-    FirebaseVisionImage visionImage = FirebaseVisionImage.fromFile(Image);
-    TextRecognizer textRecognizer = FirebaseVision.instance.textRecognizer();
-    VisionText visionText = await textRecognizer.processImage(visionImage);
 
-    for (TextBlock block in visionText.blocks) {
-
-      for (TextLine line in block.lines) {
-        for (TextElement word in line.elements) {
-
-            text = text + word.text + ' ';
-
-        }
-        text = text + '\n';
-      }
-    }
-    textRecognizer.close();
-  }
 
 }
